@@ -1,291 +1,88 @@
-/* =========================================
-   DANNY PORTFOLIO
-   Interactive JavaScript
-========================================= */
+// ================================
+// Danny Portfolio - Interactive JS
+// ================================
 
-"use strict";
+// Current year
+document.getElementById("year").textContent = new Date().getFullYear();
 
-/* =========================================
-   NAVBAR SCROLL EFFECT
-========================================= */
+// Mobile navigation
+const menuButton = document.querySelector(".menu-toggle");
+const navigation = document.querySelector(".nav-links");
 
-const navbar = document.querySelector(".navbar");
-
-function handleNavbarScroll() {
-    if (!navbar) return;
-
-    if (window.scrollY > 30) {
-        navbar.classList.add("scrolled");
-    } else {
-        navbar.classList.remove("scrolled");
-    }
+if (menuButton && navigation) {
+    menuButton.addEventListener("click", () => {
+        navigation.classList.toggle("active");
+    });
 }
 
-window.addEventListener("scroll", handleNavbarScroll);
-
-
-/* =========================================
-   SCROLL REVEAL
-========================================= */
-
-const revealElements = document.querySelectorAll(
-    ".section-heading, " +
-    ".about-main-card, " +
-    ".about-side-card, " +
-    ".timeline-item, " +
-    ".achievement-card, " +
-    ".skill-card, " +
-    ".experiment-card, " +
-    ".scholarship-content, " +
-    ".mit-card, " +
-    ".vision-statement, " +
-    ".contact-content"
-);
-
-revealElements.forEach((element) => {
-    element.style.opacity = "0";
-    element.style.transform = "translateY(35px)";
-    element.style.transition =
-        "opacity 0.8s ease, transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)";
+// Close mobile menu after clicking a link
+document.querySelectorAll(".nav-links a").forEach((link) => {
+    link.addEventListener("click", () => {
+        navigation?.classList.remove("active");
+    });
 });
 
+// Smooth scrolling
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", function (event) {
+        const target = document.querySelector(this.getAttribute("href"));
+
+        if (target) {
+            event.preventDefault();
+
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+    });
+});
+
+// Scroll reveal animation
+const revealElements = document.querySelectorAll(".reveal");
 
 const revealObserver = new IntersectionObserver(
-    (entries, observer) => {
+    (entries) => {
         entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-
-            entry.target.style.opacity = "1";
-            entry.target.style.transform = "translateY(0)";
-
-            observer.unobserve(entry.target);
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                revealObserver.unobserve(entry.target);
+            }
         });
     },
     {
-        threshold: 0.12,
-        rootMargin: "0px 0px -50px 0px"
+        threshold: 0.15
     }
 );
-
 
 revealElements.forEach((element) => {
     revealObserver.observe(element);
 });
 
+// Active navigation link while scrolling
+const sections = document.querySelectorAll("section[id]");
+const navLinks = document.querySelectorAll(".nav-links a");
 
-/* =========================================
-   SMOOTH NAVIGATION
-========================================= */
+window.addEventListener("scroll", () => {
+    let currentSection = "";
 
-const navigationLinks = document.querySelectorAll(
-    'a[href^="#"]'
-);
+    sections.forEach((section) => {
+        const sectionTop = section.offsetTop - 180;
+        const sectionHeight = section.offsetHeight;
 
-navigationLinks.forEach((link) => {
-    link.addEventListener("click", (event) => {
-
-        const targetId = link.getAttribute("href");
-
-        if (!targetId || targetId === "#") {
-            return;
+        if (
+            window.scrollY >= sectionTop &&
+            window.scrollY < sectionTop + sectionHeight
+        ) {
+            currentSection = section.getAttribute("id");
         }
+    });
 
-        const target = document.querySelector(targetId);
+    navLinks.forEach((link) => {
+        link.classList.remove("active");
 
-        if (!target) {
-            return;
+        if (link.getAttribute("href") === `#${currentSection}`) {
+            link.classList.add("active");
         }
-
-        event.preventDefault();
-
-        target.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
     });
-});
-
-
-/* =========================================
-   ACTIVE NAVIGATION LINK
-========================================= */
-
-const sections = document.querySelectorAll(
-    "main section[id]"
-);
-
-const navLinks = document.querySelectorAll(
-    ".nav-links a"
-);
-
-
-const sectionObserver = new IntersectionObserver(
-    (entries) => {
-
-        entries.forEach((entry) => {
-
-            if (!entry.isIntersecting) {
-                return;
-            }
-
-            const currentId = entry.target.getAttribute("id");
-
-            navLinks.forEach((link) => {
-
-                const linkTarget =
-                    link.getAttribute("href");
-
-                link.classList.toggle(
-                    "active",
-                    linkTarget === `#${currentId}`
-                );
-            });
-
-        });
-
-    },
-    {
-        threshold: 0.35
-    }
-);
-
-
-sections.forEach((section) => {
-    sectionObserver.observe(section);
-});
-
-
-/* =========================================
-   MAGNETIC BUTTON EFFECT
-========================================= */
-
-const magneticButtons = document.querySelectorAll(
-    ".primary-button, .secondary-button, .nav-button"
-);
-
-
-magneticButtons.forEach((button) => {
-
-    button.addEventListener("mousemove", (event) => {
-
-        const rect = button.getBoundingClientRect();
-
-        const x =
-            event.clientX -
-            rect.left -
-            rect.width / 2;
-
-        const y =
-            event.clientY -
-            rect.top -
-            rect.height / 2;
-
-        button.style.transform =
-            `translate(${x * 0.08}px, ${y * 0.08}px)`;
-    });
-
-
-    button.addEventListener("mouseleave", () => {
-        button.style.transform = "";
-    });
-
-});
-
-
-/* =========================================
-   AI CARD PARALLAX
-========================================= */
-
-const aiCard = document.querySelector(".ai-card");
-
-if (aiCard) {
-
-    aiCard.addEventListener("mousemove", (event) => {
-
-        const rect =
-            aiCard.getBoundingClientRect();
-
-        const x =
-            event.clientX -
-            rect.left -
-            rect.width / 2;
-
-        const y =
-            event.clientY -
-            rect.top -
-            rect.height / 2;
-
-        const rotateY =
-            (x / rect.width) * 8;
-
-        const rotateX =
-            -(y / rect.height) * 8;
-
-        aiCard.style.animation =
-            "none";
-
-        aiCard.style.transform =
-            `perspective(1000px)
-             rotateX(${rotateX}deg)
-             rotateY(${rotateY}deg)
-             translateY(-6px)`;
-    });
-
-
-    aiCard.addEventListener("mouseleave", () => {
-
-        aiCard.style.animation =
-            "";
-
-        aiCard.style.transform = "";
-    });
-
-}
-
-
-/* =========================================
-   CURRENT YEAR
-========================================= */
-
-const footerYear =
-    document.querySelector(".footer-bottom span");
-
-if (footerYear) {
-
-    const currentYear =
-        new Date().getFullYear();
-
-    footerYear.textContent =
-        `© ${currentYear} Daniyal Aslam`;
-}
-
-
-/* =========================================
-   REDUCE MOTION SUPPORT
-========================================= */
-
-const prefersReducedMotion =
-    window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    ).matches;
-
-
-if (prefersReducedMotion) {
-
-    document.documentElement.style
-        .scrollBehavior = "auto";
-
-}
-
-
-/* =========================================
-   PAGE LOADED
-========================================= */
-
-window.addEventListener("load", () => {
-
-    document.body.classList.add(
-        "page-loaded"
-    );
-
 });
